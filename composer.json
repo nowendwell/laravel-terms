@@ -1,0 +1,54 @@
+{
+    "name": "nowendwell/laravel-terms",
+    "description": "A tool for adding terms and conditions to your project",
+    "keywords": [
+        "nowendwell",
+        "laravel-terms"
+    ],
+    "homepage": "https://github.com/nowendwell/laravel-terms",
+    "license": "MIT License (MIT)",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Ben Miller",
+            "email": "nowendwell@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "5.7.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.7.*",
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nowendwell\\LaravelTerms\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nowendwell\\LaravelTerms\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nowendwell\\LaravelTerms\\LaravelTermsServiceProvider"
+            ],
+            "aliases": {
+                "LaravelTerms": "Nowendwell\\LaravelTerms\\LaravelTermsFacade"
+            }
+        }
+    }
+}
