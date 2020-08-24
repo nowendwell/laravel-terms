@@ -2,7 +2,9 @@
 
 namespace Nowendwell\LaravelTerms;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 
 class LaravelTermsServiceProvider extends ServiceProvider
 {
@@ -14,34 +16,30 @@ class LaravelTermsServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-terms');
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-terms');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'terms');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'terms');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravel-terms.php'),
-            ], 'config');
+
+            // $this->publishes([
+            //     __DIR__.'/../config/config.php' => config_path('terms.php'),
+            // ], 'config');
 
             // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-terms'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-terms'),
-            ], 'assets');*/
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/terms'),
+            ], 'views');
 
             // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-terms'),
-            ], 'lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
+            $this->publishes([
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/terms'),
+            ], 'lang');
         }
+
+        $router = $this->app->make(Router::class);
+        $router->pushMiddlewareToGroup('web', AcceptedTerms::class);
     }
 
     /**
@@ -50,7 +48,8 @@ class LaravelTermsServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-terms');
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'terms');
+
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-terms', function () {
