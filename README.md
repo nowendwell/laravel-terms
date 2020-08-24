@@ -17,14 +17,16 @@ composer require nowendwell/laravel-terms
 
 ## Usage
 
+Add the AcceptsTerms trait to your user model and you're good to go!
 ``` php
-// Usage description here
-```
+<?php
 
-### Testing
+use Nowendwell\LaravelTerms\Traits\AcceptsTerms;
 
-``` bash
-composer test
+class User
+{
+    use AcceptsTerms;
+}
 ```
 
 ### Changelog
