@@ -1,8 +1,11 @@
 <?php
 
-/**
- * You can place your custom package configuration in here.
- */
 return [
 
+    /**
+     * Paths to exclude from the global middleware check
+     */
+    'excluded_paths' => [
+        'logout',
+    ],
 ];

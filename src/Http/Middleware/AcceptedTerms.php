@@ -14,7 +14,8 @@ class AcceptedTerms
             auth()->check() &&
             ! auth()->user()->hasAcceptedTerms() &&
             ! $request->routeIs('terms.show') &&
-            ! $request->routeIs('terms.store')
+            ! $request->routeIs('terms.store') &&
+            ! in_array($request->path(), config('terms.excluded_paths'))
         ) {
             return redirect()->route('terms.show');
         }
