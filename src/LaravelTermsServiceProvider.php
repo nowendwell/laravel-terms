@@ -37,13 +37,11 @@ class LaravelTermsServiceProvider extends ServiceProvider
                 __DIR__.'/../resources/lang' => resource_path('lang/vendor/terms'),
             ], 'lang');
 
-            if (! class_exists('CreateLaravelTermsTable') && ! class_exists('CreateLaravelUsersTable')) {
-                // Publish migration files.
-                $this->publishes([
-                    __DIR__.'/../database/migrations/create_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_terms_table'),
-                    __DIR__.'/../database/migrations/create_user_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_user_terms_table'),
-                ], 'migrations');
-            }
+            // Publish migration files.
+            $this->publishes([
+                __DIR__.'/../database/migrations/create_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_terms_table'),
+                __DIR__.'/../database/migrations/create_user_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_user_terms_table'),
+            ], 'migrations');
         }
 
         $router = $this->app->make(Router::class);
