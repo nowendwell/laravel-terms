@@ -13,6 +13,8 @@ You can install the package via composer:
 
 ```bash
 composer require nowendwell/laravel-terms
+php artisan vendor:publish --provider="Nowendwell\LaravelTerms\LaravelTermsServiceProvider"
+php artisan migrate
 ```
 
 ## Usage

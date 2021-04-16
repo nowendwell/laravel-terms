@@ -2,7 +2,10 @@
 
 namespace Nowendwell\LaravelTerms;
 
+use Illuminate\Support\Str;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Collection;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 
@@ -11,14 +14,11 @@ class LaravelTermsServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      */
-    public function boot()
+    public function boot(Filesystem $filesystem)
     {
         /*
          * Optional methods to load your package assets
          */
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'terms');
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'terms');
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         if ($this->app->runningInConsole()) {
@@ -36,6 +36,14 @@ class LaravelTermsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/lang' => resource_path('lang/vendor/terms'),
             ], 'lang');
+
+            if (! class_exists('CreateLaravelTermsTable') && ! class_exists('CreateLaravelUsersTable')) {
+                // Publish migration files.
+                $this->publishes([
+                    __DIR__.'/../database/migrations/create_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_terms_table'),
+                    __DIR__.'/../database/migrations/create_user_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_user_terms_table'),
+                ], 'migrations');
+            }
         }
 
         $router = $this->app->make(Router::class);
@@ -55,5 +63,22 @@ class LaravelTermsServiceProvider extends ServiceProvider
         $this->app->singleton('laravel-terms', function () {
             return new LaravelTerms;
         });
+    }
+
+    /**
+     * Returns existing migration file if found, else uses the current timestamp.
+     *
+     * @param Filesystem $filesystem
+     * @return string
+     */
+    protected function getMigrationFileName(Filesystem $filesystem, $filename): string
+    {
+        $timestamp = date('Y_m_d_His');
+
+        return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
+            ->flatMap(function ($path) use ($filesystem, $filename) {
+                return $filesystem->glob($path."*_{$filename}.php");
+            })->push($this->app->databasePath()."/migrations/{$timestamp}_{$filename}.php")
+            ->first();
     }
 }
