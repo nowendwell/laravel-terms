@@ -7,6 +7,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use Nowendwell\LaravelTerms\Contracts\Term;
 use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 
 class LaravelTermsServiceProvider extends ServiceProvider
@@ -58,9 +59,17 @@ class LaravelTermsServiceProvider extends ServiceProvider
 
 
         // Register the main class to use with the facade
-        $this->app->singleton('laravel-terms', function () {
-            return new LaravelTerms;
+        $this->app->singleton('laravel-terms', function ($app) {
+            return new LaravelTerms($app['config']['terms']);
         });
+
+        // Register the main class to use with the facade
+        $this->app->singleton(LaravelTerms::class, function ($app) {
+            return new LaravelTerms($app['config']['terms']);
+        });
+
+        // Bind the contract to model implementation
+        $this->app->bind(Term::class, fn($app) => new $app['config']['model']);
     }
 
     /**
@@ -78,5 +87,18 @@ class LaravelTermsServiceProvider extends ServiceProvider
                 return $filesystem->glob($path."*_{$filename}.php");
             })->push($this->app->databasePath()."/migrations/{$timestamp}_{$filename}.php")
             ->first();
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            LaravelTerms::class,
+            Term::class,
+        ];
     }
 }
