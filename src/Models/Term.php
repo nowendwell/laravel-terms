@@ -15,6 +15,6 @@ class Term extends Model implements TermContract
      * @var array
      */
     protected $fillable = [
-        'terms'
+        'terms',
     ];
 }

@@ -4,7 +4,6 @@ namespace Nowendwell\LaravelTerms\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Nowendwell\LaravelTerms\LaravelTerms;
-use Nowendwell\LaravelTerms\Models\Term;
 
 trait AcceptsTerms
 {
@@ -17,7 +16,7 @@ trait AcceptsTerms
     }
 
     /**
-     * @return Boolean
+     * @return bool
      */
     public function hasAcceptedTerms(): bool
     {
