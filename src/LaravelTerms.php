@@ -7,7 +7,7 @@ use Nowendwell\LaravelTerms\Contracts\Term;
 class LaravelTerms
 {
     /**
-     * Name of the model
+     * Name of the model.
      *
      * @var  string
      */

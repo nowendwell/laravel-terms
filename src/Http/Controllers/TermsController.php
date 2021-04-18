@@ -33,8 +33,7 @@ class TermsController extends Controller
             'terms' => 'required',
         ]);
 
-        tap($terms->current(), function($term) use ($request) {
-
+        tap($terms->current(), function ($term) use ($request) {
             $request->user()->terms()->attach($term);
 
             event(new AgreedToTerms($request->user(), $term));

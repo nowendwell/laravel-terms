@@ -3,9 +3,7 @@
 namespace Nowendwell\LaravelTerms\Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Exceptions\Handler;
-use Illuminate\Support\Facades\Schema;
 use Nowendwell\LaravelTerms\LaravelTermsServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Throwable;

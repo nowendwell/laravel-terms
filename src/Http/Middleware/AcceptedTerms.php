@@ -4,7 +4,6 @@ namespace Nowendwell\LaravelTerms\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class AcceptedTerms
 {
@@ -18,6 +17,7 @@ class AcceptedTerms
             ! in_array($request->path(), config('terms.excluded_paths'))
         ) {
             session(['url.intended' => $request->url()]);
+
             return redirect()->route('terms.show');
         }
 

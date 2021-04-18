@@ -2,10 +2,9 @@
 
 namespace Nowendwell\LaravelTerms;
 
-use Illuminate\Support\Str;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Nowendwell\LaravelTerms\Contracts\Term;
 use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
@@ -23,7 +22,6 @@ class LaravelTermsServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         if ($this->app->runningInConsole()) {
-
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('terms.php'),
             ], 'config');
@@ -57,7 +55,6 @@ class LaravelTermsServiceProvider extends ServiceProvider
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'terms');
 
-
         // Register the main class to use with the facade
         $this->app->singleton('laravel-terms', function ($app) {
             return new LaravelTerms($app['config']['terms']);
@@ -69,7 +66,7 @@ class LaravelTermsServiceProvider extends ServiceProvider
         });
 
         // Bind the contract to model implementation
-        $this->app->bind(Term::class, fn($app) => new $app['config']['model']);
+        $this->app->bind(Term::class, fn ($app) => new $app['config']['model']);
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Nowendwell\LaravelTerms\Tests;
 
-use Nowendwell\LaravelTerms\LaravelTerms;
 use Nowendwell\LaravelTerms\Contracts\Term;
+use Nowendwell\LaravelTerms\LaravelTerms;
 
 class LaravelTermsTest extends TestCase
 {
@@ -40,7 +40,6 @@ class LaravelTermsTest extends TestCase
         $this->assertCount(3, $model->get());
         $this->assertEquals(3, LaravelTerms::current()->getKey());
         $this->assertTrue($model->latest($model->getKeyName())->first()->is(LaravelTerms::current()));
-
     }
 
     /**
