@@ -24,11 +24,12 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
                 'create_terms_table',
                 'create_user_terms_table',
             ])
-            ->hasRoute('web.php')
+            ->hasRoute('web')
             ->hasTranslations()
             ->hasViews();
 
         $this->publishMiddleware();
+        $this->updateConfig();
     }
 
     /**
@@ -58,5 +59,20 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         $this->publishes([
             $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php') => app_path("Http/Middleware/AcceptedTerms.php"),
         ], "{$this->package->shortName()}-middleware");
+    }
+
+    public function updateConfig()
+    {
+        // Add terms paths to the excluded_paths key
+        $existing_paths = config('terms.excluded_paths');
+
+        $new_paths = [];
+        foreach(config('terms.paths') as $path) {
+            $new_paths[] = 'terms/' . ltrim($path, '/');
+        }
+
+        $paths = array_merge($existing_paths, $new_paths);
+
+        config(['terms.excluded_paths' => $paths]);
     }
 }
