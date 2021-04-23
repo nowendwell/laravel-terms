@@ -31,6 +31,36 @@ class User
 }
 ```
 
+## Middleware
+
+This package comes with middleware pre-configured for the happy path. It is up to you how your app should determine *who* needs to go through the middleware check. Below is an example of a User who requires Terms.
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class AcceptedTerms
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if (
+            auth()->check() &&
+            ! auth()->user()->hasAcceptedTerms() &&
+            ! in_array($request->path(), config('terms.excluded_paths'))
+        ) {
+            session(['url.intended' => $request->url()]);
+            return redirect()->route('terms.show');
+        }
+
+        return $next($request);
+    }
+}
+```
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
