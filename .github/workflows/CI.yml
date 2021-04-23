@@ -44,9 +44,9 @@ jobs:
       id: composer-cache
       run: |
         echo "::set-output name=dir::$(composer config cache-files-dir)"
-      uses: actions/cache@v2
 
     - name: Cache
+      uses: actions/cache@v2
       id: actions-cache
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
