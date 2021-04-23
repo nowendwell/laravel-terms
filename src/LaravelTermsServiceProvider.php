@@ -39,7 +39,9 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
      */
     public function packageBooted()
     {
-        tap($this->app->make(Router::class), fn($router)=>$router->pushMiddlewareToGroup('web', \App\Http\Middleware\AcceptedTerms::class));
+        tap($this->app->make(Router::class), function ($router) {
+            return $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AcceptedTerms::class);
+        });
     }
 
     /**
@@ -57,7 +59,8 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function publishMiddleware()
     {
         $this->publishes([
-            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php') => app_path("Http/Middleware/AcceptedTerms.php"),
+            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php') =>
+            app_path("Http/Middleware/AcceptedTerms.php"),
         ], "{$this->package->shortName()}-middleware");
     }
 
