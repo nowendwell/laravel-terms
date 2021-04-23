@@ -32,28 +32,35 @@ jobs:
     name: P${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.dependency-stability }} - ${{ matrix.operating-system}}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+
     - name: Install PHP versions
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
+
     - name: Get Composer Cache Directory 2
       id: composer-cache
       run: |
         echo "::set-output name=dir::$(composer config cache-files-dir)"
-     - uses: actions/cache@v2
+      uses: actions/cache@v2
+
+    - name: Cache
       id: actions-cache
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-composer-
-     - name: Cache PHP dependencies
+
+    - name: Cache PHP dependencies
       uses: actions/cache@v2
       id: vendor-cache
       with:
         path: vendor
         key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
+
     - name: Install Laravel Dependencies
       run: |
         composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
@@ -65,9 +72,10 @@ jobs:
     - name: PHP Version
       run: php --version
 
-# Code quality
+    # Code quality
     - name: Execute tests (Unit and Feature tests) via PHPUnit
-# Set environment
+
+    # Set environment
       env:
         SESSION_DRIVER: array
 
