@@ -62,7 +62,7 @@ jobs:
     - name: Install Laravel Dependencies
       run: |
         composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-        composer update --${{ matrix.dependency-stability }} --prefer-dist --no-interaction --no-suggest
+        composer update --${{ matrix.dependency-stability }} --prefer-dist --no-interaction
 
 
     - name: Show dir
