@@ -5,7 +5,6 @@ namespace Nowendwell\LaravelTerms\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Redirect;
 use Nowendwell\LaravelTerms\Models\Term;
 use Nowendwell\LaravelTerms\Events\AgreedToTerms;
 

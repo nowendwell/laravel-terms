@@ -59,7 +59,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function publishMiddleware()
     {
         $this->publishes([
-            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php') =>
+            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php.stub') =>
             app_path("Http/Middleware/AcceptedTerms.php"),
         ], "{$this->package->shortName()}-middleware");
     }
@@ -67,10 +67,10 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function updateConfig()
     {
         // Add terms paths to the excluded_paths key
-        $existing_paths = config('terms.excluded_paths');
+        $existing_paths = config('terms.excluded_paths', []);
 
         $new_paths = [];
-        foreach (config('terms.paths') as $path) {
+        foreach (config('terms.paths', []) as $path) {
             $new_paths[] = 'terms/' . ltrim($path, '/');
         }
 
