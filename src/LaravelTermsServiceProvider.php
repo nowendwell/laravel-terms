@@ -50,7 +50,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function packageRegistered()
     {
         $this->app->singleton('laravel-terms', function () {
-            return new LaravelTerms;
+            return new LaravelTerms();
         });
     }
 
@@ -67,7 +67,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         $existing_paths = config('terms.excluded_paths');
 
         $new_paths = [];
-        foreach(config('terms.paths') as $path) {
+        foreach (config('terms.paths') as $path) {
             $new_paths[] = 'terms/' . ltrim($path, '/');
         }
 
