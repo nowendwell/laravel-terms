@@ -8,7 +8,8 @@ use Nowendwell\LaravelTerms\Models\Term;
 
 class AgreedToTerms
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public $user;
     public $term;

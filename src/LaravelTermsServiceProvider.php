@@ -2,67 +2,45 @@
 
 namespace Nowendwell\LaravelTerms;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Collection;
-use Illuminate\Support\ServiceProvider;
-use Nowendwell\LaravelTerms\Contracts\Term;
 use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class LaravelTermsServiceProvider extends ServiceProvider
+class LaravelTermsServiceProvider extends PackageServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * Configure Package.
+     *
+     * @param  \Spatie\LaravelPackageTools\Package $package
+     * @return void
      */
-    public function boot(Filesystem $filesystem)
+    public function configurePackage(Package $package): void
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $package
+            ->name('terms')
+            ->hasConfigFile()
+            ->hasMigrations([
+                'create_terms_table',
+                'create_user_terms_table',
+            ])
+            ->hasRoute('web')
+            ->hasTranslations()
+            ->hasViews();
 
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('terms.php'),
-            ], 'config');
-
-            // Publishing the views.
-            $this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/terms'),
-            ], 'views');
-
-            // Publishing the translation files.
-            $this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/terms'),
-            ], 'lang');
-
-            // Publish migration files.
-            $this->publishes([
-                __DIR__.'/../database/migrations/create_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_terms_table'),
-                __DIR__.'/../database/migrations/create_user_terms_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_user_terms_table'),
-            ], 'migrations');
-        }
-
-        $router = $this->app->make(Router::class);
-        $router->pushMiddlewareToGroup('web', AcceptedTerms::class);
+        $this->publishMiddleware();
+        $this->updateConfig();
     }
 
     /**
-     * Register the application services.
+     * Run after package is booted
+     *
+     * @return void
      */
-    public function register()
+    public function packageBooted()
     {
-        // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'terms');
-
-        // Register the main class to use with the facade
-        $this->app->singleton('laravel-terms', function ($app) {
-            return new LaravelTerms($app['config']['terms']);
-        });
-
-        // Register the main class to use with the facade
-        $this->app->singleton(LaravelTerms::class, function ($app) {
-            return new LaravelTerms($app['config']['terms']);
+        tap($this->app->make(Router::class), function ($router) {
+            return $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AcceptedTerms::class);
         });
 
         // Bind the contract to model implementation
@@ -70,20 +48,38 @@ class LaravelTermsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Returns existing migration file if found, else uses the current timestamp.
+     * Run after package is registered
      *
-     * @param Filesystem $filesystem
-     * @return string
+     * @return void
      */
-    protected function getMigrationFileName(Filesystem $filesystem, $filename): string
+    public function packageRegistered()
     {
-        $timestamp = date('Y_m_d_His');
+        $this->app->singleton('laravel-terms', function () {
+            return new LaravelTerms();
+        });
+    }
 
-        return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
-            ->flatMap(function ($path) use ($filesystem, $filename) {
-                return $filesystem->glob($path."*_{$filename}.php");
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_{$filename}.php")
-            ->first();
+    public function publishMiddleware()
+    {
+        $this->publishes([
+            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php.stub') =>
+            app_path("Http/Middleware/AcceptedTerms.php"),
+        ], "{$this->package->shortName()}-middleware");
+    }
+
+    public function updateConfig()
+    {
+        // Add terms paths to the excluded_paths key
+        $existing_paths = config('terms.excluded_paths', []);
+
+        $new_paths = [];
+        foreach (config('terms.paths', []) as $path) {
+            $new_paths[] = 'terms/' . ltrim($path, '/');
+        }
+
+        $paths = array_merge($existing_paths, $new_paths);
+
+        config(['terms.excluded_paths' => $paths]);
     }
 
     /**

@@ -1,9 +1,11 @@
 # Laravel Terms
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/nowendwell/laravel-terms.svg?style=flat-square)](https://packagist.org/packages/nowendwell/laravel-terms)
-[![Build Status](https://img.shields.io/travis/nowendwell/laravel-terms/master.svg?style=flat-square)](https://travis-ci.org/nowendwell/laravel-terms)
-[![Quality Score](https://img.shields.io/scrutinizer/g/nowendwell/laravel-terms.svg?style=flat-square)](https://scrutinizer-ci.com/g/nowendwell/laravel-terms)
 [![Total Downloads](https://img.shields.io/packagist/dt/nowendwell/laravel-terms.svg?style=flat-square)](https://packagist.org/packages/nowendwell/laravel-terms)
+[![Build Status](https://github.com/nowendwell/laravel-terms/actions/workflows/CI.yml/badge.svg)](https://github.com/nowendwell/laravel-terms/actions/workflows/CI.yml/badge.svg)
+[![Quality Score](https://img.shields.io/scrutinizer/g/nowendwell/laravel-terms.svg?style=flat-square)](https://scrutinizer-ci.com/g/nowendwell/laravel-terms)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/nowendwell/laravel-terms)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/nowendwell/laravel-terms)
 
 Keep users up to date with your terms and conditions changes. This package provides middleware to intercept requests and redirect to the latest terms.
 
@@ -28,6 +30,36 @@ use Nowendwell\LaravelTerms\Traits\AcceptsTerms;
 class User
 {
     use AcceptsTerms;
+}
+```
+
+## Middleware
+
+This package comes with middleware pre-configured for the happy path. It is up to you how your app should determine *who* needs to go through the middleware check. Below is an example of a User who requires Terms.
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class AcceptedTerms
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if (
+            auth()->check() &&
+            ! auth()->user()->hasAcceptedTerms() &&
+            ! in_array($request->path(), config('terms.excluded_paths'))
+        ) {
+            session(['url.intended' => $request->url()]);
+            return redirect()->route('terms.show');
+        }
+
+        return $next($request);
+    }
 }
 ```
 
