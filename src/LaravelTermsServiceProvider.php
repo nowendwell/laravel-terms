@@ -19,7 +19,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('terms')
-            ->hasConfigFile()
+            ->hasConfigFile('terms')
             ->hasMigrations([
                 'create_terms_table',
                 'create_user_terms_table',
@@ -27,9 +27,6 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
             ->hasRoute('web')
             ->hasTranslations()
             ->hasViews();
-
-        $this->publishMiddleware();
-        $this->updateConfig();
     }
 
     /**
@@ -42,9 +39,12 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         tap($this->app->make(Router::class), function ($router) {
             return $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AcceptedTerms::class);
         });
-
         // Bind the contract to model implementation
         $this->app->bind(Term::class, fn ($app) => new $app['config']['model']);
+        // Add publishable middleware
+        $this->publishMiddleware();
+        // Make sure the latest and agree routes are not behind middleware
+        $this->updateConfig();
     }
 
     /**
@@ -59,6 +59,9 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         });
     }
 
+    /**
+     * @return void
+     */
     public function publishMiddleware()
     {
         $this->publishes([
@@ -67,12 +70,16 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         ], "{$this->package->shortName()}-middleware");
     }
 
+    /**
+     * @return void
+     */
     public function updateConfig()
     {
         // Add terms paths to the excluded_paths key
         $existing_paths = config('terms.excluded_paths', []);
 
         $new_paths = [];
+
         foreach (config('terms.paths', []) as $path) {
             $new_paths[] = 'terms/' . ltrim($path, '/');
         }
