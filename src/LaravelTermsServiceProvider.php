@@ -4,7 +4,6 @@ namespace Nowendwell\LaravelTerms;
 
 use Illuminate\Routing\Router;
 use Nowendwell\LaravelTerms\Contracts\Term;
-use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -31,7 +30,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Run after package is booted
+     * Run after package is booted.
      *
      * @return void
      */
@@ -49,7 +48,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Register singleton
+     * Register singleton.
      *
      * @return void
      */
@@ -72,8 +71,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function publishMiddleware()
     {
         $this->publishes([
-            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php.stub') =>
-            app_path("Http/Middleware/AcceptedTerms.php"),
+            $this->package->basePath('/../src/Http/Middleware/AcceptedTerms.php.stub') => app_path('Http/Middleware/AcceptedTerms.php'),
         ], "{$this->package->shortName()}-middleware");
     }
 
@@ -88,7 +86,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
         $new_paths = [];
 
         foreach (config('terms.paths', []) as $path) {
-            $new_paths[] = 'terms/' . ltrim($path, '/');
+            $new_paths[] = 'terms/'.ltrim($path, '/');
         }
 
         $paths = array_merge($existing_paths, $new_paths);
