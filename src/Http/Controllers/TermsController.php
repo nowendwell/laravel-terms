@@ -4,37 +4,41 @@ namespace Nowendwell\LaravelTerms\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\Providers\RouteServiceProvider;
-use Nowendwell\LaravelTerms\Models\Term;
 use Nowendwell\LaravelTerms\Events\AgreedToTerms;
+use Nowendwell\LaravelTerms\LaravelTerms;
 
 class TermsController extends Controller
 {
-    public function show()
+    /**
+     * Display the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function show(LaravelTerms $terms)
     {
         return view('terms::show', [
-            'terms' => Term::latest('id')->first(),
+            'terms' => $terms->current(),
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request, LaravelTerms $terms)
     {
         $request->validate([
             'terms' => 'required',
         ]);
 
-        $term = Term::latest('id')->first();
-        $request->user()->terms()->attach($term->id);
+        tap($terms->current(), function ($term) use ($request) {
+            $request->user()->terms()->attach($term);
 
-        event(new AgreedToTerms($request->user(), $term));
+            event(new AgreedToTerms($request->user(), $term));
+        });
 
-        if (session()->has('url.intended')) {
-            $url = session('url.intended');
-            session()->forget('url.intended');
-
-            return redirect()->to($url);
-        }
-
-        return redirect()->to(RouteServiceProvider::HOME);
+        return redirect()->intended();
     }
 }

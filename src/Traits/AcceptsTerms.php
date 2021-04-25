@@ -2,17 +2,24 @@
 
 namespace Nowendwell\LaravelTerms\Traits;
 
-use Nowendwell\LaravelTerms\Models\Term;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Nowendwell\LaravelTerms\LaravelTerms;
 
 trait AcceptsTerms
 {
-    public function terms()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function terms(): BelongsToMany
     {
-        return $this->belongsToMany(Term::class, 'user_terms')->withTimestamps();
+        return $this->belongsToMany(LaravelTerms::model(), 'user_terms')->withTimestamps();
     }
 
-    public function hasAcceptedTerms()
+    /**
+     * @return bool
+     */
+    public function hasAcceptedTerms(): bool
     {
-        return $this->terms->contains(Term::latest()->first()->id);
+        return $this->terms->contains(LaravelTerms::current());
     }
 }

@@ -3,22 +3,18 @@
 namespace Nowendwell\LaravelTerms\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Nowendwell\LaravelTerms\Contracts\Term as TermContract;
 
-class Term extends Model
+class Term extends Model implements TermContract
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = "terms";
+    use Concerns\HasFactory;
 
     /**
-     * The model's attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'terms'
+        'terms',
     ];
 }
