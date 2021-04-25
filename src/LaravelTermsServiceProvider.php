@@ -3,6 +3,7 @@
 namespace Nowendwell\LaravelTerms;
 
 use Illuminate\Routing\Router;
+use Nowendwell\LaravelTerms\Contracts\Term;
 use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -40,7 +41,7 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
             return $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AcceptedTerms::class);
         });
         // Bind the contract to model implementation
-        $this->app->bind(Term::class, fn ($app) => new $app['config']['model']);
+        $this->app->bind(Term::class, fn ($app) => $app->make(LaravelTerms::model()));
         // Add publishable middleware
         $this->publishMiddleware();
         // Make sure the latest and agree routes are not behind middleware
@@ -48,14 +49,20 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Run after package is registered
+     * Register singleton
      *
      * @return void
      */
     public function packageRegistered()
     {
-        $this->app->singleton('laravel-terms', function () {
-            return new LaravelTerms();
+        // use both classname and string interchangeably
+        $this->app->alias(LaravelTerms::class, 'laravel-terms');
+        // register singleton
+        $this->app->singleton(LaravelTerms::class, function ($app) {
+            // resolve config
+            $config = $app['config']->get('terms');
+            // create LaravelTerms
+            return new LaravelTerms($config);
         });
     }
 

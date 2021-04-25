@@ -24,6 +24,16 @@ class LaravelTermsTest extends TestCase
         $this->assertInstanceOf(Term::class, new $model);
     }
 
+    /** @test */
+    public function it_resolves_model_from_contract_for_dependency_injections()
+    {
+        $value = $this->app->make(Term::class);
+        // assert contract
+        $this->assertInstanceOf(Term::class, $value);
+        // assert implementation
+        $this->assertInstanceOf(LaravelTerms::model(), $value);
+    }
+
     /**
      * @todo  if the migration is no automatic, adjust the test
      * @test
