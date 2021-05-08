@@ -2,10 +2,11 @@
 
 namespace Nowendwell\LaravelTerms;
 
+use Illuminate\Support\Arr;
 use Illuminate\Routing\Router;
-use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Nowendwell\LaravelTerms\Http\Middleware\AcceptedTerms;
 
 class LaravelTermsServiceProvider extends PackageServiceProvider
 {
@@ -67,10 +68,11 @@ class LaravelTermsServiceProvider extends PackageServiceProvider
     public function updateConfig()
     {
         // Add terms paths to the excluded_paths key
-        $existing_paths = config('terms.excluded_paths', []);
-
+        $existing_paths = Arr::wrap(config('terms.excluded_paths', []));
+        $paths = Arr::wrap(config('terms.paths', []));
         $new_paths = [];
-        foreach (config('terms.paths', []) as $path) {
+
+        foreach ($paths as $path) {
             $new_paths[] = 'terms/' . ltrim($path, '/');
         }
 
