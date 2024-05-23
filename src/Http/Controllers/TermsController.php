@@ -35,6 +35,6 @@ class TermsController extends Controller
             return redirect()->to($url);
         }
 
-        return redirect()->to(RouteServiceProvider::HOME);
+        return redirect()->to(config('terms.redirect'));
     }
 }

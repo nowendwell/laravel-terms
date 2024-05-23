@@ -19,4 +19,9 @@ return [
         // The path to post the agreement to (default: agree)
         'agree_path' => '/agree',
     ],
+
+    /**
+     * The path to redirect to after accepting the terms
+     */
+    'redirect' => '/',
 ];
